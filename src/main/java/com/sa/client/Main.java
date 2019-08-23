@@ -1,26 +1,16 @@
-package com.sa;
+package com.sa.client;
 
-import com.sa.handlers.HttpServerHandler;
-import com.sa.handlers.Socks5ServerHandler;
 import com.sa.init.SAChannelInitializer;
 import io.netty.bootstrap.ServerBootstrap;
-import io.netty.channel.*;
+import io.netty.channel.ChannelFuture;
+import io.netty.channel.ChannelOption;
+import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
-import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
 
-@Data
-@AllArgsConstructor
-@NoArgsConstructor
-public class Dispatcher {
+public class Main {
 
-    private int port;
-
-    public void run(){
-
+    public static void main(String[] args) {
         EventLoopGroup bossGroup = new NioEventLoopGroup();     // accept new connection
         EventLoopGroup workerGroup = new NioEventLoopGroup();   //
 
@@ -39,7 +29,7 @@ public class Dispatcher {
                 .childOption(ChannelOption.SO_KEEPALIVE, false);
 
         try {
-            ChannelFuture f = bootstrap.bind(port).sync();
+            ChannelFuture f = bootstrap.bind(1087).sync();
             f.channel().closeFuture().sync();
 
         } catch (InterruptedException e) {
@@ -47,9 +37,5 @@ public class Dispatcher {
         }
         workerGroup.shutdownGracefully();
         bossGroup.shutdownGracefully();
-    }
-
-    public static void main(String[] args) {
-        new Dispatcher(1088).run(); // 还可以绑定不同的 NIC， 默认是all NICs
     }
 }

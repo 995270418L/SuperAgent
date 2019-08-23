@@ -14,9 +14,9 @@ public class HttpServerHandler extends ChannelInboundHandlerAdapter {
     public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
         try {
             System.out.println("接收到数据");
-//            ByteBuf buf = (ByteBuf) msg;
-//            String message = getMessage(buf);
-//            System.out.println(message);
+            ByteBuf buf = (ByteBuf) msg;
+            String message = getMessage(buf);
+            System.out.println(message);
             ctx.writeAndFlush(getSendByteBuf("steve")); // 如果 msg 发送出去了，消息引用计数的减少
 //        super.channelRead(ctx, msg);
 //        ((ByteBuf) msg).release();

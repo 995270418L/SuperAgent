@@ -1,40 +1,56 @@
 package com.sa.handlers;
 
-import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
-import io.netty.channel.ChannelFuture;
+import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelHandlerContext;
-import io.netty.channel.ChannelInboundHandlerAdapter;
+import io.netty.channel.SimpleChannelInboundHandler;
+import io.netty.handler.codec.socksx.SocksMessage;
+import io.netty.handler.codec.socksx.v5.*;
 
-import java.io.UnsupportedEncodingException;
-
-public class Socks5ServerHandler extends ChannelInboundHandlerAdapter {
-
-    @Override
-    public void channelActive(ChannelHandlerContext ctx) throws Exception {
-
-//        Socks5InitialRequestDecoder
-        final ByteBuf f = ctx.alloc().buffer(4);
-        f.writeInt((int) (System.currentTimeMillis() / 1000L + 2208988800L));
-
-        final ChannelFuture res = ctx.writeAndFlush(f);
-        res.addListener((e) -> ctx.close());
-    }
+public class Socks5ServerHandler extends SimpleChannelInboundHandler<SocksMessage> {
 
     @Override
-    public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
-        System.out.println("reveive");
-        ctx.writeAndFlush(getSendByteBuf("steve"));
+    protected void channelRead0(ChannelHandlerContext ctx, SocksMessage socksRequest) throws Exception {
+        switch (socksRequest.version()) {
+            case SOCKS5:
+                if (socksRequest instanceof Socks5InitialRequest) {
+                    // auth support example
+                    //ctx.pipeline().addFirst(new Socks5PasswordAuthRequestDecoder());
+                    //ctx.write(new DefaultSocks5AuthMethodResponse(Socks5AuthMethod.PASSWORD));
+                    ctx.pipeline().addFirst(new Socks5CommandRequestDecoder());
+                    ctx.write(new DefaultSocks5InitialResponse(Socks5AuthMethod.NO_AUTH));
+                } else if (socksRequest instanceof Socks5PasswordAuthRequest) {
+                    ctx.pipeline().addFirst(new Socks5CommandRequestDecoder());
+                    ctx.write(new DefaultSocks5PasswordAuthResponse(Socks5PasswordAuthStatus.SUCCESS));
+                } else if (socksRequest instanceof Socks5CommandRequest) {
+                    Socks5CommandRequest socks5CmdRequest = (Socks5CommandRequest) socksRequest;
+                    if (socks5CmdRequest.type() == Socks5CommandType.CONNECT) {
+                        ctx.pipeline().addLast(new SocksServerConnectHandler());
+                        ctx.pipeline().remove(this);
+                        ctx.fireChannelRead(socksRequest);
+                    } else {
+                        ctx.close();
+                    }
+                } else {
+                    ctx.close();
+                }
+                break;
+            case UNKNOWN:
+                ctx.close();
+                break;
+        }
     }
 
-
-    private ByteBuf getSendByteBuf(String message)
-            throws UnsupportedEncodingException {
-
-        byte[] req = message.getBytes("UTF-8");
-        ByteBuf pingMessage = Unpooled.buffer();
-        pingMessage.writeBytes(req);
-
-        return pingMessage;
+    @Override
+    public void channelReadComplete(ChannelHandlerContext ctx) {
+        ctx.flush();
     }
+
+    @Override
+    public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
+        if (ctx.channel().isActive()) {
+            ctx.channel().writeAndFlush(Unpooled.EMPTY_BUFFER).addListener(ChannelFutureListener.CLOSE);
+        }
+    }
+
 }
