@@ -1,4 +1,4 @@
-package com.sa.client.handlers.demo;
+package com.sa.server.handlers.demo;
 
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;

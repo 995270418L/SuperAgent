@@ -1,6 +1,6 @@
-package com.sa.client.init;
+package com.sa.server.init;
 
-import com.sa.client.handlers.Socks5ServerHandler;
+import com.sa.server.handlers.Socks5ServerHandler;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.ChannelPipeline;
 import io.netty.channel.socket.SocketChannel;

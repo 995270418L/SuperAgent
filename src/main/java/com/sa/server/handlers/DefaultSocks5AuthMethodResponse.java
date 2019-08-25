@@ -1,4 +1,4 @@
-package com.sa.client.handlers;
+package com.sa.server.handlers;
 
 import io.netty.handler.codec.socksx.v5.AbstractSocks5Message;
 import io.netty.handler.codec.socksx.v5.Socks5AuthMethod;

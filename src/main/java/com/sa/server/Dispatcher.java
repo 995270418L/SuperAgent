@@ -1,6 +1,6 @@
-package com.sa.client;
+package com.sa.server;
 
-import com.sa.client.handlers.demo.OneHandler;
+import com.sa.server.handlers.demo.OneHandler;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.*;
 import io.netty.channel.nio.NioEventLoopGroup;

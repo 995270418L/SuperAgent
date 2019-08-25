@@ -1,4 +1,4 @@
-package com.sa.client.handlers;
+package com.sa.server.handlers;
 
 import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelFutureListener;
