@@ -1,8 +1,6 @@
-package com.sa;
+package com.sa.client;
 
-import com.sa.handlers.HttpServerHandler;
-import com.sa.handlers.Socks5ServerHandler;
-import com.sa.init.SAChannelInitializer;
+import com.sa.client.handlers.demo.OneHandler;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.*;
 import io.netty.channel.nio.NioEventLoopGroup;
@@ -20,33 +18,36 @@ public class Dispatcher {
     private int port;
 
     public void run(){
-
         EventLoopGroup bossGroup = new NioEventLoopGroup();     // accept new connection
-        EventLoopGroup workerGroup = new NioEventLoopGroup();   //
+        EventLoopGroup workerGroup = new NioEventLoopGroup();   // deal parent connection
 
         ServerBootstrap bootstrap = new ServerBootstrap();
+//        bootstrap.group(bossGroup, workerGroup)
+//                .channel(NioServerSocketChannel.class)
+//                .childHandler(new SAChannelInitializer())
+//                .option(ChannelOption.SO_BACKLOG, 1024) // 连接数
+//                .childOption(ChannelOption.SO_KEEPALIVE, false);
+
         bootstrap.group(bossGroup, workerGroup)
                 .channel(NioServerSocketChannel.class)
-//                .childHandler(new ChannelInitializer<SocketChannel>() {
-//                    protected void initChannel(SocketChannel socketChannel) throws Exception {
-//                        ChannelPipeline p = socketChannel.pipeline();
-//                        p.addLast(new HttpServerHandler());
-//                    }
-//                })
-                .childHandler(new SAChannelInitializer())
-                .option(ChannelOption.SO_BACKLOG, 128) // 连接数
-                .option(ChannelOption.TCP_NODELAY, true)
+                .childHandler(new ChannelInitializer<SocketChannel>() {
+                    @Override
+                    protected void initChannel(SocketChannel ch) throws Exception {
+                        ch.pipeline().addLast(new OneHandler());
+                    }
+                })
+                .option(ChannelOption.SO_BACKLOG, 1024) // 连接数
                 .childOption(ChannelOption.SO_KEEPALIVE, false);
 
         try {
             ChannelFuture f = bootstrap.bind(port).sync();
             f.channel().closeFuture().sync();
-
         } catch (InterruptedException e) {
             e.printStackTrace();
+        }finally {
+            workerGroup.shutdownGracefully();
+            bossGroup.shutdownGracefully();
         }
-        workerGroup.shutdownGracefully();
-        bossGroup.shutdownGracefully();
     }
 
     public static void main(String[] args) {

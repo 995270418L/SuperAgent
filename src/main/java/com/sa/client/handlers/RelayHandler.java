@@ -1,6 +1,6 @@
-package com.sa.handlers;
+package com.sa.client.handlers;
 
-import com.sa.util.SocksServerUtils;
+import com.sa.client.util.SocksServerUtils;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;

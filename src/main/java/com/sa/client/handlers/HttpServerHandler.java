@@ -1,4 +1,4 @@
-package com.sa.handlers;
+package com.sa.client.handlers;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;

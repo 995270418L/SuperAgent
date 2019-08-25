@@ -1,4 +1,4 @@
-package com.sa.handlers;
+package com.sa.client.handlers;
 
 import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelFutureListener;
@@ -15,12 +15,12 @@ public class Socks5ServerHandler extends SimpleChannelInboundHandler<SocksMessag
             case SOCKS5:
                 if (socksRequest instanceof Socks5InitialRequest) {
                     // auth support example
-                    //ctx.pipeline().addFirst(new Socks5PasswordAuthRequestDecoder());
-                    //ctx.write(new DefaultSocks5AuthMethodResponse(Socks5AuthMethod.PASSWORD));
-                    ctx.pipeline().addFirst(new Socks5CommandRequestDecoder());
-                    ctx.write(new DefaultSocks5InitialResponse(Socks5AuthMethod.NO_AUTH));
+                    ctx.pipeline().addFirst(new Socks5PasswordAuthRequestDecoder());
+                    ctx.write(new DefaultSocks5InitialResponse(Socks5AuthMethod.PASSWORD));
+//                    ctx.pipeline().addFirst(new Socks5CommandRequestDecoder());
+//                    ctx.write(new DefaultSocks5InitialResponse(Socks5AuthMethod.NO_AUTH));
                 } else if (socksRequest instanceof Socks5PasswordAuthRequest) {
-                    ctx.pipeline().addFirst(new Socks5CommandRequestDecoder());
+                    ctx.pipeline().addFirst(new Socks5CommandRequestDecoder()); // 应该用password去验证
                     ctx.write(new DefaultSocks5PasswordAuthResponse(Socks5PasswordAuthStatus.SUCCESS));
                 } else if (socksRequest instanceof Socks5CommandRequest) {
                     Socks5CommandRequest socks5CmdRequest = (Socks5CommandRequest) socksRequest;

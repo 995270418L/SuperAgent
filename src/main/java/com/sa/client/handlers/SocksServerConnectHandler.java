@@ -1,19 +1,20 @@
-package com.sa.handlers;
+package com.sa.client.handlers;
 
-import com.sa.util.SocksServerUtils;
+import com.sa.client.util.SocksServerUtils;
+import io.netty.bootstrap.Bootstrap;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.*;
 import io.netty.channel.socket.nio.NioSocketChannel;
 import io.netty.handler.codec.socksx.SocksMessage;
-import io.netty.handler.codec.socksx.v4.Socks4CommandRequest;
 import io.netty.handler.codec.socksx.v5.DefaultSocks5CommandResponse;
 import io.netty.handler.codec.socksx.v5.Socks5CommandRequest;
 import io.netty.handler.codec.socksx.v5.Socks5CommandStatus;
-import io.netty.util.concurrent.EventExecutorGroup;
 import io.netty.util.concurrent.FutureListener;
 import io.netty.util.concurrent.Promise;
 
 public class SocksServerConnectHandler extends SimpleChannelInboundHandler<SocksMessage> {
+
+    private final Bootstrap b = new Bootstrap();
 
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, SocksMessage message) throws Exception {

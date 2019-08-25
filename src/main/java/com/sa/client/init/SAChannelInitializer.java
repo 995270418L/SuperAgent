@@ -1,6 +1,6 @@
-package com.sa.init;
+package com.sa.client.init;
 
-import com.sa.handlers.Socks5ServerHandler;
+import com.sa.client.handlers.Socks5ServerHandler;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.ChannelPipeline;
 import io.netty.channel.socket.SocketChannel;
@@ -15,7 +15,8 @@ public class SAChannelInitializer extends ChannelInitializer<SocketChannel> {
         ChannelPipeline p = socketChannel.pipeline();
         p.addLast(
                 new LoggingHandler(LogLevel.DEBUG),
-                new SocksPortUnificationServerHandler());
+                new SocksPortUnificationServerHandler(),
+                new Socks5ServerHandler());
 
     }
 }

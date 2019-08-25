@@ -1,4 +1,4 @@
-package com.sa.util;
+package com.sa.client.util;
 
 import io.netty.buffer.Unpooled;
 import io.netty.channel.Channel;
